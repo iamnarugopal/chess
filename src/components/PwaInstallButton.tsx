@@ -42,10 +42,12 @@ export default function PwaInstallButton() {
     return null;
   }
 
-  async function handleInstall() {
-    await deferredPrompt.prompt();
+  const installPrompt = deferredPrompt;
 
-    await deferredPrompt.userChoice;
+  async function handleInstall() {
+    await installPrompt.prompt();
+
+    await installPrompt.userChoice;
     setDeferredPrompt(null);
   }
 
