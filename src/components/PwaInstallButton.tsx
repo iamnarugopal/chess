@@ -23,17 +23,11 @@ export default function PwaInstallButton() {
       setDeferredPrompt(null);
     };
 
-    window.addEventListener(
-      "beforeinstallprompt",
-      onBeforeInstallPrompt,
-    );
+    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
     window.addEventListener("appinstalled", onAppInstalled);
 
     return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        onBeforeInstallPrompt,
-      );
+      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
       window.removeEventListener("appinstalled", onAppInstalled);
     };
   }, []);
@@ -42,12 +36,13 @@ export default function PwaInstallButton() {
     return null;
   }
 
-  const installPrompt = deferredPrompt;
 
   async function handleInstall() {
-    await installPrompt.prompt();
+    if (!deferredPrompt) return;
 
-    await installPrompt.userChoice;
+    await deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+
     setDeferredPrompt(null);
   }
 
