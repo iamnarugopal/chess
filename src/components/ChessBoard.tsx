@@ -11,10 +11,12 @@ import type {
 } from "react-chessboard";
 
 import { Chess, type Move, type Square } from "chess.js";
+import { SiGithub } from "react-icons/si";
 
 import ChessSettings from "./ChessSettings";
 import GameResultModal from "./GameResultModal";
 import MobileSettingsDrawer from "./MobileSettingsDrawer";
+import PwaInstallButton from "./PwaInstallButton";
 
 import {
   DEFAULT_ELO,
@@ -158,12 +160,26 @@ export default function ChessBoard() {
       if (!result) return false;
 
       setGameResult(result);
-      setIsResultModalOpen(true);
 
       return true;
     },
     [],
   );
+
+  useEffect(() => {
+    if (!gameResult) {
+      setIsResultModalOpen(false);
+      return;
+    }
+
+    setIsResultModalOpen(false);
+
+    const timer = window.setTimeout(() => {
+      setIsResultModalOpen(true);
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [gameResult]);
 
   // Initialize Stockfish
   useEffect(() => {
@@ -478,25 +494,38 @@ export default function ChessBoard() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white lg:h-screen lg:overflow-hidden">
-      <div className="flex min-h-screen lg:h-full lg:min-h-0">
+    <main className="h-full min-h-0 bg-zinc-950 text-white overflow-hidden">
+      <div className="flex h-full min-h-0">
         {/* Desktop sidebar */}
-        <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-zinc-900 p-6 lg:block">
-          <div className="mb-6">
-            <h1 className="text-xl font-semibold">Chess Settings</h1>
+        <aside className="minimal-scrollbar hidden w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-zinc-900 p-6 lg:block">
+          <div className="flex min-h-full flex-col">
+            <div className="mb-6">
+              <h1 className="text-xl font-semibold">Chess Settings</h1>
 
-            <p className="mt-1 text-sm text-zinc-400">
-              Choose your side, difficulty and board theme.
-            </p>
+              <p className="mt-1 text-sm text-zinc-400">
+                Choose your side, difficulty and board theme.
+              </p>
+            </div>
+
+            <ChessSettings {...chessSettingsProps} showPlayAs showTakeBack />
+
+            <a
+              href="https://github.com/iamnarugopal/chess"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-zinc-200 transition hover:bg-white/10 hover:text-white"
+            >
+              <SiGithub aria-hidden="true" className="size-4" />
+
+              Open Source on GitHub
+            </a>
           </div>
-
-          <ChessSettings {...chessSettingsProps} showPlayAs showTakeBack />
         </aside>
 
         {/* Main game area */}
-        <section className="relative flex min-h-screen min-w-0 flex-1 flex-col lg:min-h-0">
+        <section className="relative flex min-h-0 min-w-0 flex-1 flex-col">
           {/* Mobile header */}
-          <header className="flex items-center justify-between border-b border-white/10 bg-zinc-900/80 px-4 py-3 backdrop-blur lg:hidden">
+          <header className="flex items-center justify-between border-b border-white/10 bg-zinc-900/80 backdrop-blur lg:hidden p-3">
             <div>
               <h1 className="font-semibold">Chess</h1>
 
@@ -507,19 +536,36 @@ export default function ChessBoard() {
               </p>
             </div>
 
-            <MobileSettingsDrawer>
-              <ChessSettings
-                {...chessSettingsProps}
-                showPlayAs={false}
-                showTakeBack={false}
-              />
-            </MobileSettingsDrawer>
+            <div className="flex items-center gap-2">
+              <PwaInstallButton />
+
+              <MobileSettingsDrawer>
+                <div className="flex h-full flex-col">
+                  <ChessSettings
+                    {...chessSettingsProps}
+                    showPlayAs={false}
+                    showTakeBack={false}
+                  />
+
+                  <a
+                    href="https://github.com/iamnarugopal/chess"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-6 flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-zinc-200 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <SiGithub aria-hidden="true" className="size-4" />
+
+                    Open Source on GitHub
+                  </a>
+                </div>
+              </MobileSettingsDrawer>
+            </div>
           </header>
 
           {/* Chessboard area */}
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-3 sm:p-5 lg:p-6">
+          <div className="flex min-h-0 flex-1 flex-col">
             {/* Mobile game controls */}
-            <div className="flex w-full items-center gap-2 lg:hidden">
+            <div className="flex w-full items-center gap-2 px-4 py-3 lg:hidden">
               <button
                 type="button"
                 onClick={() => startNewGame("w")}
@@ -555,8 +601,10 @@ export default function ChessBoard() {
             </div>
 
             {/* Chessboard */}
-            <div className="size-[min(calc(100vw-1.5rem),calc(100vh-9rem))] select-none lg:size-[min(calc(100vw-21rem),calc(100vh-3rem))]">
-              <Chessboard options={chessboardOptions} />
+            <div className="flex flex-1 items-center justify-center min-h-0 min-w-0 overflow-hidden">
+              <div className="aspect-square w-full max-w-full select-none lg:size-[min(calc(100vw-18rem),100vh)] lg:w-auto">
+                <Chessboard options={chessboardOptions} />
+              </div>
             </div>
           </div>
         </section>

@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chess PWA
+
+A fast, browser-based chess game built with Next.js, Stockfish, and react-chessboard.
+
+Play against the engine, switch sides, change board themes, enable sounds, and install the app as a PWA on supported browsers.
+
+## Features
+
+- Play as White or Black against Stockfish
+- Multiple board themes
+- Move, capture, check, castle, promote, and game-over sounds
+- Mobile-friendly layout with in-app controls
+- Installable PWA with a native app-style window
+- Responsive sidebar and mobile settings drawer
+- Take back moves during a game
+
+## Tech Stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- chess.js
+- react-chessboard
+- stockfish
+- Base UI components
+- Tailwind CSS
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20 or newer
+- npm
+
+### Install
+
+```bash
+npm install
+```
+
+### Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build for production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+### Start the production server
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How to Play
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Open the app.
+2. Choose your color.
+3. Make your moves on the board.
+4. Use the settings panel to change difficulty, board theme, or sound.
+5. Use Take Back if you want to undo a move.
 
-## Deploy on Vercel
+## PWA / Install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is configured as a PWA and can be installed on supported browsers.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- On mobile, look for the Install button in the top bar when the browser marks the app as installable.
+- On desktop Chrome, use the install icon in the address bar or the browser menu.
+- If the prompt does not appear immediately, refresh once after opening the app from localhost.
+
+## Project Structure
+
+```text
+src/
+	app/
+		layout.tsx
+		page.tsx
+		globals.css
+	components/
+		ChessBoard.tsx
+		ChessSettings.tsx
+		GameResultModal.tsx
+		MobileSettingsDrawer.tsx
+		PwaInstallButton.tsx
+		PwaRegistration.tsx
+public/
+	sounds/
+	stockfish/
+	manifest.webmanifest
+```
+
+## Scripts
+
+- npm run dev - start the development server
+- npm run build - create the production build
+- npm run start - start the production server
+- npm run lint - run ESLint
+
+## Notes
+
+- The app uses Stockfish in the browser through a Web Worker.
+- Sound playback may require a user gesture before the browser allows audio.
+- The project is configured for static export, so it can be deployed to static hosting.
+
+## License
+
+No license file is included yet.

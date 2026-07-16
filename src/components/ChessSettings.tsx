@@ -182,7 +182,7 @@ export default function ChessSettings({
           Board theme
         </h2>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {Object.entries(boardThemes).map(
             ([theme, colors]) => {
               const isActive =
@@ -197,13 +197,14 @@ export default function ChessSettings({
                       theme as ThemeName,
                     )
                   }
-                  className={`flex items-center gap-3 rounded-lg border p-2 text-left transition ${
+                  aria-label={`${theme} board theme`}
+                  className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 transition ${
                     isActive
                       ? "border-blue-500 bg-blue-500/10"
                       : "border-white/10 bg-white/5 hover:bg-white/10"
                   }`}
                 >
-                  <span className="grid size-9 shrink-0 grid-cols-2 grid-rows-2 overflow-hidden rounded-md">
+                  <span className="absolute inset-1 grid grid-cols-2 grid-rows-2 overflow-hidden rounded-md">
                     <span
                       style={{
                         backgroundColor:
@@ -231,14 +232,10 @@ export default function ChessSettings({
                           colors.light,
                       }}
                     />
-                  </span>
-
-                  <span className="text-sm font-medium capitalize">
-                    {theme}
                   </span>
 
                   {isActive && (
-                    <span className="ml-auto size-2 rounded-full bg-blue-500" />
+                    <span className="absolute right-2 top-2 size-2 rounded-full bg-blue-500" />
                   )}
                 </button>
               );

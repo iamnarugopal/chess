@@ -18,10 +18,10 @@ export default function MobileSettingsDrawer({
       </Drawer.Trigger>
 
       <Drawer.Portal>
-        <Drawer.Backdrop className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 lg:hidden" />
+        <Drawer.Backdrop className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
 
         <Drawer.Viewport className="fixed inset-0 z-50 lg:hidden">
-          <Drawer.Popup className="absolute inset-y-0 left-0 flex w-[min(88vw,360px)] flex-col border-r border-white/10 bg-zinc-900 text-white shadow-2xl transition-transform duration-300 ease-out data-[ending-style]:-translate-x-full data-[starting-style]:-translate-x-full">
+          <Drawer.Popup className="absolute inset-y-0 left-0 flex w-[min(88vw,360px)] flex-col border-r border-white/10 bg-zinc-900 text-white shadow-2xl transition-transform duration-300 ease-out data-ending-style:-translate-x-full data-starting-style:-translate-x-full">
             <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
               <div>
                 <Drawer.Title className="font-semibold text-white">
@@ -41,7 +41,7 @@ export default function MobileSettingsDrawer({
               </Drawer.Close>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto p-5">
+            <div className="minimal-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4">
               {children}
             </div>
           </Drawer.Popup>

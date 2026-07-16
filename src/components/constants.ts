@@ -1,6 +1,6 @@
 export const MIN_ELO = 1320;
 export const MAX_ELO = 3190;
-export const DEFAULT_ELO = 2000;
+export const DEFAULT_ELO = MAX_ELO;
 
 export const STOCKFISH_MOVE_TIME = 500;
 
