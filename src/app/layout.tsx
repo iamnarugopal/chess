@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import PwaRegistration from "@/components/PwaRegistration";
 import "./globals.css";
@@ -18,11 +18,14 @@ export const metadata: Metadata = {
   description: "Play chess against Stockfish in a browser PWA.",
   applicationName: "Chess",
   manifest: "/manifest.webmanifest",
-  themeColor: "#0a0a0a",
   icons: {
     icon: "/favicon.png",
     apple: "/180x180.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
