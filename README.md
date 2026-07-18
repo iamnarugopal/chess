@@ -4,6 +4,9 @@ A fast, browser-based chess game built with Next.js, Stockfish, and react-chessb
 
 Play against the engine, switch sides, change board themes, enable sounds, and install the app as a PWA on supported browsers.
 
+
+![Chess UI](/public/screen.png)
+
 ## Features
 
 - Play as White or Black against Stockfish
