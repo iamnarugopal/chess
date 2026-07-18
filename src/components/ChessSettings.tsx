@@ -1,16 +1,8 @@
 import { Slider } from "@base-ui/react/slider";
 
-import {
-  MAX_ELO,
-  MIN_ELO,
-  boardThemes,
-  type ThemeName,
-} from "./constants";
+import { MAX_ELO, MIN_ELO, boardThemes, type ThemeName } from "./constants";
 
-import type {
-  GameResult,
-  PlayerColor,
-} from "./types";
+import type { GameResult, PlayerColor } from "./types";
 
 import { getDifficultyLabel } from "./utils";
 
@@ -51,17 +43,14 @@ export default function ChessSettings({
   onSoundToggle,
   onTakeBack,
 }: ChessSettingsProps) {
-  const difficultyLabel =
-    getDifficultyLabel(stockfishElo);
+  const difficultyLabel = getDifficultyLabel(stockfishElo);
 
   return (
     <div className="flex flex-col gap-6">
       {/* Play as */}
       {showPlayAs && (
         <section>
-          <h2 className="mb-3 text-sm font-medium text-zinc-300">
-            Play as
-          </h2>
+          <h2 className="mb-3 text-sm font-medium text-zinc-300">Play as</h2>
 
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -94,15 +83,11 @@ export default function ChessSettings({
       {/* Difficulty */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-medium text-zinc-300">
-            Difficulty
-          </h2>
+          <h2 className="text-sm font-medium text-zinc-300">Difficulty</h2>
 
           <div className="text-right">
             <span className="block text-sm font-semibold text-white">
-              {stockfishElo >= MAX_ELO
-                ? "Maximum"
-                : `${stockfishElo} Elo`}
+              {stockfishElo >= MAX_ELO ? "Maximum" : `${stockfishElo} Elo`}
             </span>
 
             <span className="block text-xs text-zinc-500">
@@ -141,9 +126,7 @@ export default function ChessSettings({
       <section>
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-sm font-medium text-zinc-300">
-              Sound
-            </h2>
+            <h2 className="text-sm font-medium text-zinc-300">Sound</h2>
 
             <p className="mt-1 text-xs text-zinc-500">
               Chess move and game sounds
@@ -154,22 +137,14 @@ export default function ChessSettings({
             type="button"
             onClick={onSoundToggle}
             aria-pressed={soundEnabled}
-            aria-label={
-              soundEnabled
-                ? "Disable sound"
-                : "Enable sound"
-            }
+            aria-label={soundEnabled ? "Disable sound" : "Enable sound"}
             className={`relative h-7 w-12 shrink-0 rounded-full p-1 transition-colors ${
-              soundEnabled
-                ? "bg-blue-500"
-                : "bg-zinc-700"
+              soundEnabled ? "bg-blue-500" : "bg-zinc-700"
             }`}
           >
             <span
               className={`block size-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                soundEnabled
-                  ? "translate-x-5"
-                  : "translate-x-0"
+                soundEnabled ? "translate-x-5" : "translate-x-0"
               }`}
             />
           </button>
@@ -178,69 +153,56 @@ export default function ChessSettings({
 
       {/* Board theme */}
       <section>
-        <h2 className="mb-3 text-sm font-medium text-zinc-300">
-          Board theme
-        </h2>
+        <h2 className="mb-3 text-sm font-medium text-zinc-300">Board theme</h2>
 
         <div className="grid grid-cols-4 gap-2">
-          {Object.entries(boardThemes).map(
-            ([theme, colors]) => {
-              const isActive =
-                boardTheme === theme;
+          {Object.entries(boardThemes).map(([theme, colors]) => {
+            const isActive = boardTheme === theme;
 
-              return (
-                <button
-                  key={theme}
-                  type="button"
-                  onClick={() =>
-                    onThemeChange(
-                      theme as ThemeName,
-                    )
-                  }
-                  aria-label={`${theme} board theme`}
-                  className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 transition ${
-                    isActive
-                      ? "border-blue-500 bg-blue-500/10"
-                      : "border-white/10 bg-white/5 hover:bg-white/10"
-                  }`}
-                >
-                  <span className="absolute inset-1 grid grid-cols-2 grid-rows-2 overflow-hidden rounded-md">
-                    <span
-                      style={{
-                        backgroundColor:
-                          colors.light,
-                      }}
-                    />
+            return (
+              <button
+                key={theme}
+                type="button"
+                onClick={() => onThemeChange(theme as ThemeName)}
+                aria-label={`${theme} board theme`}
+                className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 transition ${
+                  isActive
+                    ? "border-blue-500 bg-blue-500/10"
+                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                <span className="absolute inset-1 grid grid-cols-2 grid-rows-2 overflow-hidden rounded-md">
+                  <span
+                    style={{
+                      backgroundColor: colors.light,
+                    }}
+                  />
 
-                    <span
-                      style={{
-                        backgroundColor:
-                          colors.dark,
-                      }}
-                    />
+                  <span
+                    style={{
+                      backgroundColor: colors.dark,
+                    }}
+                  />
 
-                    <span
-                      style={{
-                        backgroundColor:
-                          colors.dark,
-                      }}
-                    />
+                  <span
+                    style={{
+                      backgroundColor: colors.dark,
+                    }}
+                  />
 
-                    <span
-                      style={{
-                        backgroundColor:
-                          colors.light,
-                      }}
-                    />
-                  </span>
+                  <span
+                    style={{
+                      backgroundColor: colors.light,
+                    }}
+                  />
+                </span>
 
-                  {isActive && (
-                    <span className="absolute right-2 top-2 size-2 rounded-full bg-blue-500" />
-                  )}
-                </button>
-              );
-            },
-          )}
+                {isActive && (
+                  <span className="absolute right-2 top-2 size-2 rounded-full bg-blue-500" />
+                )}
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -252,20 +214,13 @@ export default function ChessSettings({
 
         {gameResult ? (
           <>
-            <p className="mt-1 font-medium">
-              {gameResult.title}
-            </p>
+            <p className="mt-1 font-medium">{gameResult.title}</p>
 
-            <p className="mt-1 text-xs text-zinc-400">
-              {gameResult.message}
-            </p>
+            <p className="mt-1 text-xs text-zinc-400">{gameResult.message}</p>
           </>
         ) : (
           <p className="mt-1 font-medium">
-            {currentTurn === "w"
-              ? "White"
-              : "Black"}{" "}
-            to move
+            {currentTurn === "w" ? "White" : "Black"} to move
           </p>
         )}
       </section>

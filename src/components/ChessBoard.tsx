@@ -11,6 +11,15 @@ import type {
 } from "react-chessboard";
 
 import { Chess, type Move, type Square } from "chess.js";
+import { FaRobot, FaUser } from "react-icons/fa";
+import {
+  GiChessBishop,
+  GiChessKing,
+  GiChessKnight,
+  GiChessPawn,
+  GiChessQueen,
+  GiChessRook,
+} from "react-icons/gi";
 import { SiGithub } from "react-icons/si";
 
 import ChessSettings from "./ChessSettings";
@@ -27,6 +36,7 @@ import {
 } from "./constants";
 
 import type {
+  CapturedPiece,
   GameResult,
   MoveSquareStyles,
   PlayerColor,
@@ -42,7 +52,7 @@ export default function ChessBoard() {
 
   const [moveSquares, setMoveSquares] = useState<MoveSquareStyles>({});
 
-  const [boardTheme, setBoardTheme] = useState<ThemeName>("brown");
+  const [boardTheme, setBoardTheme] = useState<ThemeName>("green");
 
   const [playerColor, setPlayerColor] = useState<PlayerColor>("w");
 
@@ -445,6 +455,98 @@ export default function ChessBoard() {
 
   const canTakeBack = game.history().length > 0;
 
+  const takenPieces = game.history({ verbose: true }).reduce(
+    (pieces, move) => {
+      if (!move.captured) {
+        return pieces;
+      }
+
+      pieces[move.color].push({
+        type: move.captured,
+        color: move.color === "w" ? "b" : "w",
+      });
+
+      return pieces;
+    },
+    {
+      w: [] as CapturedPiece[],
+      b: [] as CapturedPiece[],
+    },
+  );
+
+  const playerTakenPieces = takenPieces[playerColor];
+
+  const stockfishTakenPieces = takenPieces[playerColor === "w" ? "b" : "w"];
+
+  const checkedKingSquare = game.inCheck()
+    ? (game.findPiece({ type: "k", color: game.turn() })[0] ?? null)
+    : null;
+
+  const pieceIcons = {
+    p: GiChessPawn,
+    n: GiChessKnight,
+    b: GiChessBishop,
+    r: GiChessRook,
+    q: GiChessQueen,
+    k: GiChessKing,
+  } as const;
+
+  function renderCapturedPiece(piece: CapturedPiece, index: number) {
+    const PieceIcon = pieceIcons[piece.type];
+
+    return (
+      <span
+        key={`${piece.type}-${piece.color}-${index}`}
+        title={`${piece.color === "w" ? "White" : "Black"} ${piece.type.toUpperCase()}`}
+        className={`flex items-center justify-center ${
+          piece.color === "w" ? "text-zinc-100" : "text-zinc-400"
+        }`}
+      >
+        <PieceIcon className="size-4" aria-hidden="true" />
+      </span>
+    );
+  }
+
+  function renderProfileCard(
+    name: string,
+    Icon: typeof FaRobot,
+    takenPieces: CapturedPiece[],
+    accentClassName: string,
+  ) {
+    return (
+      <section className="">
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex size-11 shrink-0 items-center justify-center rounded-md border border-white/10 ${accentClassName}`}
+          >
+            <Icon className="size-5 text-white" aria-hidden="true" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-white">{name}</p>
+            {takenPieces.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {takenPieces.map((piece, index) =>
+                  renderCapturedPiece(piece, index),
+                )}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const squareStyles = checkedKingSquare
+    ? {
+        ...moveSquares,
+        [checkedKingSquare]: {
+          background: "rgba(239, 68, 68, 0.45)",
+          boxShadow: "inset 0 0 0 3px rgba(255, 255, 255, 0.25)",
+        },
+      }
+    : moveSquares;
+
   const chessSettingsProps = {
     playerColor,
     boardTheme,
@@ -468,7 +570,7 @@ export default function ChessBoard() {
 
     onSquareClick,
 
-    squareStyles: moveSquares,
+    squareStyles,
 
     boardOrientation: playerColor === "w" ? "white" : "black",
 
@@ -491,11 +593,37 @@ export default function ChessBoard() {
     draggingPieceGhostStyle: {
       opacity: 0.25,
     },
+    alphaNotationStyle: { fontSize: "10px" },
+    numericNotationStyle: {
+      fontSize: "10px",
+    },
   };
 
+  const SIDEBAR_WIDTH = 320;
+
+  const [boardWidth, setBoardWidth] = useState(600);
+
+  useEffect(() => {
+    const updateBoardSize = () => {
+      const availableWidth =
+        window.innerWidth >= 1024
+          ? window.innerWidth - SIDEBAR_WIDTH - 48
+          : window.innerWidth - 32;
+
+      const availableHeight = window.innerHeight - 32;
+
+      setBoardWidth(Math.max(280, Math.min(availableWidth, availableHeight)));
+    };
+
+    updateBoardSize();
+
+    window.addEventListener("resize", updateBoardSize);
+    return () => window.removeEventListener("resize", updateBoardSize);
+  }, []);
+
   return (
-    <main className="h-full min-h-0 bg-zinc-950 text-white overflow-hidden">
-      <div className="flex h-full min-h-0">
+    <main className="text-white h-full">
+      <div className="flex h-full">
         {/* Desktop sidebar */}
         <aside className="minimal-scrollbar hidden w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-zinc-900 p-6 lg:block">
           <div className="flex min-h-full flex-col">
@@ -516,14 +644,13 @@ export default function ChessBoard() {
               className="mt-6 flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-zinc-200 transition hover:bg-white/10 hover:text-white"
             >
               <SiGithub aria-hidden="true" className="size-4" />
-
               Open Source on GitHub
             </a>
           </div>
         </aside>
 
         {/* Main game area */}
-        <section className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        <section className="grow relative flex flex-col overflow-auto">
           {/* Mobile header */}
           <header className="flex items-center justify-between border-b border-white/10 bg-zinc-900/80 backdrop-blur lg:hidden p-3">
             <div>
@@ -554,7 +681,6 @@ export default function ChessBoard() {
                     className="mt-6 flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-zinc-200 transition hover:bg-white/10 hover:text-white"
                   >
                     <SiGithub aria-hidden="true" className="size-4" />
-
                     Open Source on GitHub
                   </a>
                 </div>
@@ -563,7 +689,7 @@ export default function ChessBoard() {
           </header>
 
           {/* Chessboard area */}
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div className="relative flex flex-1 flex-col xl:flex-row">
             {/* Mobile game controls */}
             <div className="flex w-full items-center gap-2 px-4 py-3 lg:hidden">
               <button
@@ -600,11 +726,45 @@ export default function ChessBoard() {
               </button>
             </div>
 
+            <div className="px-4 py-3 xl:hidden">
+              {renderProfileCard(
+                "Stockfish",
+                FaRobot,
+                stockfishTakenPieces,
+                "bg-gradient-to-br from-zinc-800 to-zinc-700",
+              )}
+            </div>
+
+            <div className="hidden w-70 shrink-0 flex-col justify-between gap-4 px-3 py-3 xl:flex">
+              {renderProfileCard(
+                "Stockfish",
+                FaRobot,
+                stockfishTakenPieces,
+                "bg-gradient-to-br from-zinc-800 to-zinc-700",
+              )}
+
+              {renderProfileCard(
+                "You",
+                FaUser,
+                playerTakenPieces,
+                "bg-gradient-to-br from-sky-600 to-cyan-500",
+              )}
+            </div>
+
             {/* Chessboard */}
-            <div className="flex flex-1 items-center justify-center min-h-0 min-w-0 overflow-hidden">
-              <div className="aspect-square w-full max-w-full select-none lg:size-[min(calc(100vw-18rem),100vh)] lg:w-auto">
+            <div className="flex min-h-0 min-w-0 flex-1 items-center xl:overflow-hidden">
+              <div className="aspect-square w-full xl:max-w-[min(calc(100vw-22rem),calc(100vh))] h-auto shrink-0">
                 <Chessboard options={chessboardOptions} />
               </div>
+            </div>
+
+            <div className="px-4 py-3 xl:hidden">
+              {renderProfileCard(
+                "You",
+                FaUser,
+                playerTakenPieces,
+                "bg-gradient-to-br from-sky-600 to-cyan-500",
+              )}
             </div>
           </div>
         </section>

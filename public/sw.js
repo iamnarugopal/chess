@@ -1,10 +1,11 @@
-const CACHE_NAME = "chess-pwa-v1";
+const CACHE_NAME = "chess-pwa-v2";
 const PRECACHE_URLS = [
   "/",
   "/manifest.webmanifest",
-  "/favicon.ico",
-  "/icon",
-  "/apple-icon",
+  "/favicon.png",
+  "/180x180.png",
+  "/192x192.png",
+  "/512x512.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -36,6 +37,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  if (event.request.headers.has("range")) {
+    return;
+  }
+
   const requestUrl = new URL(event.request.url);
 
   if (requestUrl.origin !== self.location.origin) {
@@ -54,7 +59,7 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cachedResponse) => {
       const networkResponse = fetch(event.request)
         .then((response) => {
-          if (response && response.ok) {
+          if (response && response.status === 200) {
             const responseClone = response.clone();
 
             caches.open(CACHE_NAME).then((cache) => {

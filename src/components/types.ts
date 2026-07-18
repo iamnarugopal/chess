@@ -22,6 +22,13 @@ export type BoardTheme = {
   dark: string;
 };
 
+export type PieceType = "p" | "n" | "b" | "r" | "q" | "k";
+
+export type CapturedPiece = {
+  type: PieceType;
+  color: PlayerColor;
+};
+
 export type MoveSquareStyles = Record<
   string,
   React.CSSProperties
