@@ -24,3 +24,8 @@ export const boardThemes = {
 } as const;
 
 export type ThemeName = keyof typeof boardThemes;
+
+export const STORAGE_KEYS = {
+  SOUND: "chess_sound",
+  THEME: "chess_theme",
+} as const;

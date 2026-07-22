@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Chessboard } from "react-chessboard";
+import { pieces } from "./pieces";
 
 import type {
   ChessboardOptions,
@@ -34,6 +35,8 @@ import {
   boardThemes,
   type ThemeName,
 } from "./constants";
+
+import { STORAGE_KEYS } from "./constants";
 
 import type {
   CapturedPiece,
@@ -77,6 +80,20 @@ export default function ChessBoard() {
   const searchIdRef = useRef(0);
 
   const activeSearchIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
+
+    if (savedTheme && Object.keys(boardThemes).includes(savedTheme)) {
+      setBoardTheme(savedTheme as ThemeName);
+    }
+
+    const savedSound = localStorage.getItem(STORAGE_KEYS.SOUND);
+
+    if (savedSound !== null) {
+      setSoundEnabled(savedSound === "true");
+    }
+  }, []);
 
   useEffect(() => {
     playerColorRef.current = playerColor;
@@ -449,6 +466,8 @@ export default function ChessBoard() {
 
       soundEnabledRef.current = next;
 
+      localStorage.setItem(STORAGE_KEYS.SOUND, String(next));
+
       return next;
     });
   }
@@ -491,19 +510,59 @@ export default function ChessBoard() {
     k: GiChessKing,
   } as const;
 
-  function renderCapturedPiece(piece: CapturedPiece, index: number) {
-    const PieceIcon = pieceIcons[piece.type];
+  const pieceOrder = {
+    p: 1, // Pawn
+    n: 2, // Knight
+    b: 3, // Bishop
+    r: 4, // Rook
+    q: 5, // Queen
+    k: 6, // King (never captured, but included for completeness)
+  } as const;
 
+  const pieceValues = {
+    p: 1,
+    n: 3,
+    b: 3,
+    r: 5,
+    q: 9,
+    k: 0,
+  } as const;
+
+  function getMaterialValue(pieces: CapturedPiece[]) {
+    return pieces.reduce((total, piece) => total + pieceValues[piece.type], 0);
+  }
+
+  const playerMaterial = getMaterialValue(playerTakenPieces);
+  const stockfishMaterial = getMaterialValue(stockfishTakenPieces);
+
+  const playerAdvantage = playerMaterial - stockfishMaterial;
+  const stockfishAdvantage = stockfishMaterial - playerMaterial;
+
+  // function renderCapturedPiece(piece: CapturedPiece, index: number) {
+  //   const PieceIcon = pieceIcons[piece.type];
+
+  //   return (
+  //     <span
+  //       key={`${piece.type}-${piece.color}-${index}`}
+  //       title={`${piece.color === "w" ? "White" : "Black"} ${piece.type.toUpperCase()}`}
+  //       className={`flex items-center justify-center ${
+  //         piece.color === "w" ? "text-zinc-100" : "text-zinc-400"
+  //       } ${index > 0 ? "-ml-2" : ""}`}
+  //     >
+  //       <PieceIcon className="size-4" aria-hidden="true" />
+  //     </span>
+  //   );
+  // }
+
+  function renderCapturedPiece(piece: CapturedPiece, index: number) {
     return (
-      <span
+      <img
         key={`${piece.type}-${piece.color}-${index}`}
-        title={`${piece.color === "w" ? "White" : "Black"} ${piece.type.toUpperCase()}`}
-        className={`flex items-center justify-center ${
-          piece.color === "w" ? "text-zinc-100" : "text-zinc-400"
-        }`}
-      >
-        <PieceIcon className="size-4" aria-hidden="true" />
-      </span>
+        src={`/piece/${piece.color}${piece.type}.png`}
+        alt=""
+        className={index > 0 ? "-ml-2 h-4 w-4" : "h-4 w-4"}
+        draggable={false}
+      />
     );
   }
 
@@ -512,25 +571,60 @@ export default function ChessBoard() {
     Icon: typeof FaRobot,
     takenPieces: CapturedPiece[],
     accentClassName: string,
+    advantage: number,
   ) {
+    const groupedPieces = Object.values(
+      takenPieces.reduce(
+        (acc, piece) => {
+          if (!acc[piece.type]) {
+            acc[piece.type] = [];
+          }
+
+          acc[piece.type].push(piece);
+
+          return acc;
+        },
+        {} as Record<string, CapturedPiece[]>,
+      ),
+    ).sort((a, b) => pieceOrder[a[0].type] - pieceOrder[b[0].type]);
     return (
       <section className="">
         <div className="flex items-center gap-3">
           <div
-            className={`flex size-11 shrink-0 items-center justify-center rounded-md border border-white/10 ${accentClassName}`}
+            className={`flex size-9 sm:size-11 shrink-0 items-center justify-center rounded-md border border-white/10 ${accentClassName}`}
           >
             <Icon className="size-5 text-white" aria-hidden="true" />
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white">{name}</p>
-            {takenPieces.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
+            <p className="truncate text-xs sm:text-sm font-semibold text-white">
+              {name}
+            </p>
+            {/* {takenPieces.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5 mt-1 items-center">
                 {takenPieces.map((piece, index) =>
                   renderCapturedPiece(piece, index),
                 )}
+                {advantage > 0 && (
+                  <span className="ml-1 text-sm text-zinc-300 leading-snug">
+                    +{advantage}
+                  </span>
+                )}
               </div>
-            ) : null}
+            ) : null} */}
+            <div className="flex flex-wrap mt-1 items-center">
+              {groupedPieces.map((group) => (
+                <div key={group[0].type} className="flex">
+                  {group.map((piece, index) =>
+                    renderCapturedPiece(piece, index),
+                  )}
+                </div>
+              ))}
+
+              {advantage > 0 && (
+                <span className="ml-1 text-sm text-zinc-300">+{advantage}</span>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -547,6 +641,11 @@ export default function ChessBoard() {
       }
     : moveSquares;
 
+  function handleThemeChange(theme: ThemeName) {
+    setBoardTheme(theme);
+    localStorage.setItem(STORAGE_KEYS.THEME, theme);
+  }
+
   const chessSettingsProps = {
     playerColor,
     boardTheme,
@@ -557,7 +656,7 @@ export default function ChessBoard() {
     canTakeBack,
 
     onStartNewGame: startNewGame,
-    onThemeChange: setBoardTheme,
+    onThemeChange: handleThemeChange,
     onEloChange: setStockfishElo,
     onSoundToggle: toggleSound,
     onTakeBack: takeBack,
@@ -565,7 +664,7 @@ export default function ChessBoard() {
 
   const chessboardOptions: ChessboardOptions = {
     position: game.fen(),
-
+    pieces,
     onPieceDrop: onDrop,
 
     onSquareClick,
@@ -726,12 +825,13 @@ export default function ChessBoard() {
               </button>
             </div>
 
-            <div className="px-4 py-3 xl:hidden">
+            <div className="px-4 py-3 xl:hidden my-6">
               {renderProfileCard(
                 "Stockfish",
                 FaRobot,
                 stockfishTakenPieces,
                 "bg-gradient-to-br from-zinc-800 to-zinc-700",
+                stockfishAdvantage,
               )}
             </div>
 
@@ -741,6 +841,7 @@ export default function ChessBoard() {
                 FaRobot,
                 stockfishTakenPieces,
                 "bg-gradient-to-br from-zinc-800 to-zinc-700",
+                stockfishAdvantage,
               )}
 
               {renderProfileCard(
@@ -748,6 +849,7 @@ export default function ChessBoard() {
                 FaUser,
                 playerTakenPieces,
                 "bg-gradient-to-br from-sky-600 to-cyan-500",
+                playerAdvantage,
               )}
             </div>
 
@@ -758,12 +860,13 @@ export default function ChessBoard() {
               </div>
             </div>
 
-            <div className="px-4 py-3 xl:hidden">
+            <div className="px-4 py-3 xl:hidden my-6">
               {renderProfileCard(
                 "You",
                 FaUser,
                 playerTakenPieces,
                 "bg-gradient-to-br from-sky-600 to-cyan-500",
+                playerAdvantage,
               )}
             </div>
           </div>

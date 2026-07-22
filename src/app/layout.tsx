@@ -38,7 +38,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="bg-zinc-800">
+      <body className="bg-zinc-900">
         {children}
         <PwaRegistration />
       </body>
